@@ -12,10 +12,14 @@ import {
   Divider,
   Collapse,
   IconButton,
-  Tooltip
+  Tooltip,
+  Avatar,
+  Chip,
+  useTheme,
+  alpha,
+  Badge
 } from '@mui/material';
 import {
-  Menu as MenuIcon,
   ChevronLeft,
   Dashboard,
   People,
@@ -26,28 +30,32 @@ import {
   Settings,
   ExpandLess,
   ExpandMore,
-  Store
+  TrendingUp,
+  Circle,
+  Notifications
 } from '@mui/icons-material';
 
-// Interface para itens do menu
 interface MenuItem {
   text: string;
   icon: React.ReactElement;
   path: string;
   children?: MenuItem[];
+  badge?: string;
+  isNew?: boolean;
 }
 
-// Itens do menu principal
 const menuItems: MenuItem[] = [
   {
     text: 'Dashboard',
     icon: <Dashboard />,
-    path: '/dashboard'
+    path: '/dashboard',
+    isNew: true
   },
   {
     text: 'Clientes',
     icon: <People />,
-    path: '/clientes'
+    path: '/clientes',
+    badge: '8'
   },
   {
     text: 'Ponto de Venda',
@@ -59,9 +67,9 @@ const menuItems: MenuItem[] = [
     icon: <Inventory />,
     path: '/produtos',
     children: [
-      { text: 'Cadastro', icon: <Inventory />, path: '/produtos' },
-      { text: 'Categorias', icon: <Inventory />, path: '/produtos/categorias' },
-      { text: 'Estoque', icon: <Inventory />, path: '/produtos/estoque' }
+      { text: 'Cadastro', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos/cadastro' },
+      { text: 'Categorias', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos/categorias' },
+      { text: 'Estoque', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos/estoque', badge: '5' }
     ]
   },
   {
@@ -69,8 +77,8 @@ const menuItems: MenuItem[] = [
     icon: <Receipt />,
     path: '/vendas',
     children: [
-      { text: 'Histórico', icon: <Receipt />, path: '/vendas' },
-      { text: 'Relatórios', icon: <Assessment />, path: '/vendas/relatorios' }
+      { text: 'Histórico', icon: <Circle sx={{ fontSize: 6 }} />, path: '/vendas/historico' },
+      { text: 'Relatórios', icon: <Circle sx={{ fontSize: 6 }} />, path: '/vendas/relatorios' }
     ]
   },
   {
@@ -94,9 +102,9 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const theme = useTheme();
   const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
 
-  // Alternar submenu
   const toggleSubmenu = (text: string) => {
     setOpenSubmenus(prev => ({
       ...prev,
@@ -104,30 +112,34 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
     }));
   };
 
-  // Navegar para uma rota
   const handleNavigation = (path: string) => {
     navigate(path);
-    // Fechar sidebar em dispositivos móveis
     if (window.innerWidth < 768) {
       onClose();
     }
   };
 
-  // Verificar se um item está ativo
-  const isActive = (path: string, children?: MenuItem[]): boolean => {
-    if (location.pathname === path) return true;
-    
-    if (children) {
-      return children.some(child => location.pathname.startsWith(child.path));
+  // CORREÇÃO: Lógica melhorada para verificar item ativo
+  const isActive = (item: MenuItem): boolean => {
+    // Se é um item pai com children, verifica se algum child está ativo
+    if (item.children) {
+      return item.children.some(child => 
+        location.pathname === child.path || location.pathname.startsWith(child.path + '/')
+      );
     }
     
-    return location.pathname.startsWith(path);
+    // Para items sem children ou subitems, verifica match exato ou startsWith
+    return location.pathname === item.path || location.pathname.startsWith(item.path + '/');
   };
 
-  // Renderizar um item do menu
+  const isParentActive = (item: MenuItem): boolean => {
+    return item.children ? item.children.some(child => isActive(child)) : false;
+  };
+
   const renderMenuItem = (item: MenuItem, level = 0) => {
     const hasChildren = item.children && item.children.length > 0;
-    const isItemActive = isActive(item.path, item.children);
+    const isItemActive = isActive(item);
+    const isParentItemActive = isParentActive(item);
     const isSubmenuOpen = openSubmenus[item.text];
 
     return (
@@ -137,58 +149,128 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
             onClick={() => {
               if (hasChildren) {
                 toggleSubmenu(item.text);
+                // Se é um item pai e não tem path específico, não navega
+                if (item.path && !item.path.includes('/')) {
+                  handleNavigation(item.path);
+                }
               } else {
                 handleNavigation(item.path);
               }
             }}
             sx={{
-              minHeight: 48,
+              minHeight: 42,
               justifyContent: open ? 'initial' : 'center',
-              px: 2.5,
-              pl: level > 0 ? 4 + level * 2 : 2.5,
-              backgroundColor: isItemActive ? 'primary.light' : 'transparent',
-              color: isItemActive ? 'primary.contrastText' : 'text.primary',
+              px: 2,
+              pl: level > 0 ? 3 + level * 2 : 2,
+              backgroundColor: isItemActive 
+                ? alpha(theme.palette.primary.main, 0.15)
+                : 'transparent',
+              color: isItemActive 
+                ? theme.palette.primary.main
+                : theme.palette.text.primary,
+              margin: '1px 8px',
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
+              position: 'relative',
+              border: isItemActive 
+                ? `1px solid ${alpha(theme.palette.primary.main, 0.3)}`
+                : '1px solid transparent',
               '&:hover': {
-                backgroundColor: isItemActive ? 'primary.main' : 'action.hover',
+                backgroundColor: isItemActive 
+                  ? alpha(theme.palette.primary.main, 0.2)
+                  : alpha(theme.palette.action.hover, 0.5),
+                transform: 'translateX(4px)',
               },
-              margin: '2px 8px',
-              borderRadius: 1,
+              '& .MuiListItemIcon-root': {
+                color: isItemActive ? theme.palette.primary.main : 'inherit',
+                transition: 'color 0.2s ease'
+              }
             }}
           >
-            <Tooltip title={!open ? item.text : ''} placement="right">
+            <Tooltip title={!open ? item.text : ''} placement="right" arrow>
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : 'auto',
+                  mr: open ? 2 : 'auto',
                   justifyContent: 'center',
-                  color: 'inherit',
                 }}
               >
                 {item.icon}
               </ListItemIcon>
             </Tooltip>
-            
-            <ListItemText 
-              primary={item.text} 
-              sx={{ 
+
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      fontWeight: isItemActive ? 600 : 400,
+                      fontSize: '0.85rem',
+                      color: 'inherit'
+                    }}
+                  >
+                    {item.text}
+                  </Typography>
+                  {item.isNew && open && (
+                    <Chip 
+                      label="New" 
+                      color="primary" 
+                      size="small"
+                      sx={{ 
+                        height: 18,
+                        fontSize: '0.6rem',
+                        fontWeight: 600,
+                      }}
+                    />
+                  )}
+                </Box>
+              }
+              sx={{
                 opacity: open ? 1 : 0,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
-              }} 
+              }}
             />
-            
-            {hasChildren && open && (
-              <Box sx={{ ml: 1 }}>
-                {isSubmenuOpen ? <ExpandLess /> : <ExpandMore />}
+
+            {open && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                {item.badge && (
+                  <Box
+                    sx={{
+                      backgroundColor: theme.palette.error.main,
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: 18,
+                      height: 18,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.6rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {item.badge}
+                  </Box>
+                )}
+                {hasChildren && (
+                  <ExpandMore 
+                    sx={{ 
+                      color: 'inherit',
+                      fontSize: '1rem',
+                      transform: isSubmenuOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  />
+                )}
               </Box>
             )}
           </ListItemButton>
         </ListItem>
 
-        {/* Submenu */}
         {hasChildren && open && (
-          <Collapse in={isSubmenuOpen} timeout="auto" unmountOnExit>
+          <Collapse in={isSubmenuOpen || isParentItemActive} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {item.children!.map(child => renderMenuItem(child, level + 1))}
             </List>
@@ -202,67 +284,140 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
     <Drawer
       variant="permanent"
       sx={{
-        width: open ? width : 56,
+        width: open ? width : 64,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: open ? width : 56,
+          width: open ? width : 64,
           boxSizing: 'border-box',
           transition: 'width 0.3s ease',
           overflowX: 'hidden',
-          bgcolor: 'background.paper',
-          borderRight: '1px solid',
-          borderColor: 'divider',
+          backgroundColor: theme.palette.background.paper,
+          borderRight: `1px solid ${theme.palette.divider}`,
+          boxShadow: '0 0 20px rgba(0,0,0,0.08)',
+          display: 'flex',
+          flexDirection: 'column'
         },
       }}
     >
-      {/* Cabeçalho da Sidebar */}
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+      {/* Header */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: open ? 'space-between' : 'center',
-          p: 1, 
-          minHeight: 64 
+          p: open ? 2 : 1.5,
+          minHeight: 60,
+          borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
         {open ? (
           <>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Store color="primary" />
-              <Typography variant="h6" noWrap>
-                Fynanceo ERP
-              </Typography>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: theme.palette.primary.main,
+                  color: '#ffffff',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem'
+                }}
+              >
+                <TrendingUp />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" fontWeight="700" noWrap fontSize="1.1rem">
+                  Fynanceo
+                </Typography>
+                <Typography variant="caption" color="text.secondary" fontSize="0.7rem">
+                  BUSINESS ERP
+                </Typography>
+              </Box>
             </Box>
-            <IconButton onClick={onClose} size="small">
-              <ChevronLeft />
+            <IconButton 
+              onClick={onClose} 
+              size="small"
+              sx={{
+                color: theme.palette.text.secondary,
+                width: 28,
+                height: 28,
+                '&:hover': {
+                  backgroundColor: theme.palette.action.hover,
+                }
+              }}
+            >
+              <ChevronLeft fontSize="small" />
             </IconButton>
           </>
         ) : (
-          <IconButton onClick={() => {}} size="small">
-            <MenuIcon />
-          </IconButton>
+          <Avatar
+            sx={{
+              width: 32,
+              height: 32,
+              backgroundColor: theme.palette.primary.main,
+              color: '#ffffff',
+              fontWeight: 'bold',
+              fontSize: '0.9rem'
+            }}
+          >
+            <TrendingUp />
+          </Avatar>
         )}
       </Box>
 
-      <Divider />
+      {/* Menu Items */}
+      <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
+        <List sx={{ p: 0.5 }}>
+          {menuItems.map(item => renderMenuItem(item))}
+        </List>
+      </Box>
 
-      {/* Menu de Navegação */}
-      <List sx={{ flexGrow: 1, px: 1 }}>
-        {menuItems.map(item => renderMenuItem(item))}
-      </List>
-
-      {/* Rodapé da Sidebar */}
-      <Box sx={{ p: 2 }}>
-        <Divider sx={{ mb: 2 }} />
-        {open && (
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            align="center"
-            sx={{ display: 'block' }}
-          >
-            v1.0.0
-          </Typography>
+      {/* Footer */}
+      <Box sx={{ 
+        p: 1.5, 
+        borderTop: `1px solid ${theme.palette.divider}`,
+        backgroundColor: alpha(theme.palette.primary.main, 0.03)
+      }}>
+        {open ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Badge badgeContent={6} color="error" overlap="circular">
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: theme.palette.info.main,
+                  color: '#ffffff',
+                  fontSize: '0.8rem'
+                }}
+              >
+                <Notifications />
+              </Avatar>
+            </Badge>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography variant="body2" fontWeight="500" fontSize="0.8rem">
+                Notificações
+              </Typography>
+              <Typography variant="caption" color="text.secondary" fontSize="0.7rem">
+                6 novas
+              </Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Badge badgeContent={6} color="error" overlap="circular">
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: theme.palette.info.main,
+                  color: '#ffffff',
+                  fontSize: '0.8rem'
+                }}
+              >
+                <Notifications />
+              </Avatar>
+            </Badge>
+          </Box>
         )}
       </Box>
     </Drawer>
