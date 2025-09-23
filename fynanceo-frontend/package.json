@@ -1,0 +1,46 @@
+{
+  "name": "fynanceo-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "@hookform/resolvers": "^2.9.11",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.0",
+    "@reduxjs/toolkit": "^1.9.0",
+    "axios": "^1.3.0",
+    "notistack": "^3.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.0",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "^6.8.0",
+    "react-virtualized-auto-sizer": "^1.0.26",
+    "react-window": "^1.8.10",
+    "yup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.5.2",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/react-virtualized-auto-sizer": "^1.0.4",
+    "@types/react-window": "^1.8.8",
+    "@types/yup": "^0.29.0",
+    "@vitejs/plugin-react": "^5.0.3",
+    "typescript": "^4.9.0",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
+  }
+}
