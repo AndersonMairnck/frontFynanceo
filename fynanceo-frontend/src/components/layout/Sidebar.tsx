@@ -62,6 +62,7 @@ const menuItems: MenuItem[] = [
     icon: <PointOfSale />,
     path: '/pdv'
   },
+   
   {
     text: 'Produtos',
     icon: <Inventory />,
@@ -77,6 +78,7 @@ const menuItems: MenuItem[] = [
     icon: <Receipt />,
     path: '/vendas',
     children: [
+    
       { text: 'Histórico', icon: <Circle sx={{ fontSize: 6 }} />, path: '/vendas/historico' },
       { text: 'Relatórios', icon: <Circle sx={{ fontSize: 6 }} />, path: '/vendas/relatorios' }
     ]

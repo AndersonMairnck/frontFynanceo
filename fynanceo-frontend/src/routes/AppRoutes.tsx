@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LazyLoad } from '../components/common/LazyLoad';
+import PDVPage from '../pages/pdv/PDVPage';
 
 // Páginas principais
 const DashboardPage = React.lazy(() => import('../pages/DashboardPage'));
@@ -71,7 +72,7 @@ const AppRoutes: React.FC = () => {
         path="/pdv" 
         element={
           <LazyLoad>
-            <PlaceholderPage title="Ponto de Venda" />
+            <PDVPage />
           </LazyLoad>
         } 
       />
