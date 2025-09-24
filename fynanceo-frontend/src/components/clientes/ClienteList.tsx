@@ -47,7 +47,7 @@ import {
   CalendarToday,
   TrendingUp
 } from '@mui/icons-material';
-import { Cliente } from '@/types/cliente';
+import { Cliente } from '../../types/cliente';
 
 interface ClienteListProps {
   clientes: Cliente[];

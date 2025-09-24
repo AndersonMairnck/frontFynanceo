@@ -67,8 +67,8 @@ const menuItems: MenuItem[] = [
     icon: <Inventory />,
     path: '/produtos',
     children: [
-      { text: 'Cadastro', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos/cadastro' },
-      { text: 'Categorias', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos/categorias' },
+      { text: 'Produtos', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos' },
+      { text: 'Categorias', icon: <Circle sx={{ fontSize: 6 }} />, path: '/categorias' },
       { text: 'Estoque', icon: <Circle sx={{ fontSize: 6 }} />, path: '/produtos/estoque', badge: '5' }
     ]
   },

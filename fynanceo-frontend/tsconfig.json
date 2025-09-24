@@ -23,7 +23,7 @@
     /* Path mapping */
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"],
+      "../../*": ["*"],
       "@components/*": ["components/*"],
       "@pages/*": ["pages/*"],
       "@services/*": ["services/*"],

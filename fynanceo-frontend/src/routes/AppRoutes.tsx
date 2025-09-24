@@ -9,6 +9,13 @@ const ClienteFormPage = React.lazy(() => import('../pages/clientes/ClienteFormPa
 const ClienteDetailPage = React.lazy(() => import('../pages/clientes/ClienteDetailPage'));
 const PlaceholderPage = React.lazy(() => import('../pages/PlaceholderPage'));
 
+// Novas páginas de produtos e categorias
+const ProductListPage = React.lazy(() => import('../pages/produtos/ProductListPage'));
+const ProductFormPage = React.lazy(() => import('../pages/produtos/ProductFormPage'));
+const ProductDetailPage = React.lazy(() => import('../pages/produtos/ProductDetailPage'));
+const CategoryListPage = React.lazy(() => import('../pages/categorias/CategoryListPage'));
+const CategoryFormPage = React.lazy(() => import('../pages/categorias/CategoryFormPage'));
+
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -68,14 +75,14 @@ const AppRoutes: React.FC = () => {
           </LazyLoad>
         } 
       />
-      <Route 
+      {/* <Route 
         path="/produtos" 
         element={
           <LazyLoad>
             <PlaceholderPage title="Produtos" />
           </LazyLoad>
         } 
-      />
+      /> */}
       <Route 
         path="/produtos/categorias" 
         element={
@@ -100,6 +107,8 @@ const AppRoutes: React.FC = () => {
           </LazyLoad>
         } 
       />
+
+								 
       <Route 
         path="/vendas/relatorios" 
         element={
@@ -125,6 +134,70 @@ const AppRoutes: React.FC = () => {
         } 
       />
       
+	 <Route 
+        path="/produtos" 
+        element={
+          <LazyLoad>
+            <ProductListPage />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/produtos/novo" 
+        element={
+          <LazyLoad>
+            <ProductFormPage />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/produtos/editar/:id" 
+        element={
+          <LazyLoad>
+            <ProductFormPage />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/produtos/:id" 
+        element={
+          <LazyLoad>
+            <ProductDetailPage />
+          </LazyLoad>
+        } 
+      />
+
+      {/* Rotas de Categorias */}
+      <Route 
+        path="/categorias" 
+        element={
+          <LazyLoad>
+            <CategoryListPage />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/categorias/nova" 
+        element={
+          <LazyLoad>
+            <CategoryFormPage />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/categorias/editar/:id" 
+        element={
+          <LazyLoad>
+            <CategoryFormPage />
+          </LazyLoad>
+        } 
+      />
+      
+      {/* Rota padrão */}
+      <Route path="/" element={<Navigate to="/produtos" replace />} />
+      					  
+																	  
+	  
       {/* Rota 404 */}
       <Route path="*" element={<div>Página não encontrada</div>} />
     </Routes>

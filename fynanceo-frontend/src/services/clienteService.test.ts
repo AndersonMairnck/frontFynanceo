@@ -1,5 +1,5 @@
 import api from './api';
-import { Cliente, ClienteFormData, PaginatedResponse } from '@/types/cliente';
+import { Cliente, ClienteFormData, PaginatedResponse } from '../types/cliente';
 
 // Serviço com todas as operações de cliente
 export const clienteService = {

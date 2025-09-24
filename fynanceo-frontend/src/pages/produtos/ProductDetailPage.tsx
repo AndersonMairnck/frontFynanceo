@@ -6,51 +6,47 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
-    Button // Adicionar esta importação
+  Button
 } from '@mui/material';
-import { useClientes } from '../../hooks/useClientes';
-import ClienteDetail from '../../components/clientes/ClienteDetail';
+import { useProducts } from '../../hooks/useProducts';
+import ProductDetail from '../../components/produtos/ProductDetail';
 
-const ClienteDetailPage: React.FC = () => {
+const ProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const {
-    cliente,
+    product,
     loading,
     error,
-    carregarCliente,
+    carregarProduct,
     limparErro
-  } = useClientes();
+  } = useProducts();
 
-  const clienteId = id ? parseInt(id) : undefined;
+  const productId = id ? parseInt(id) : undefined;
 
-  // Carregar cliente ao montar o componente
   useEffect(() => {
-    if (clienteId) {
-      carregarCliente(clienteId);
+    if (productId) {
+      carregarProduct(productId);
     }
-  }, [clienteId, carregarCliente]);
+  }, [productId, carregarProduct]);
 
-  // Navegação
   const handleEdit = () => {
-    if (cliente) {
-      navigate(`/clientes/editar/${cliente.id}`);
+    if (product) {
+      navigate(`/produtos/editar/${product.id}`);
     }
   };
 
   const handleBack = () => {
-    navigate('/clientes');
+    navigate('/produtos');
   };
 
-  // Limpar erro ao desmontar
   useEffect(() => {
     return () => {
       limparErro();
     };
   }, [limparErro]);
 
-  // Loading
-  if (loading || !cliente) {
+  if (loading || !product) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -60,7 +56,6 @@ const ClienteDetailPage: React.FC = () => {
     );
   }
 
-  // Erro
   if (error) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -76,25 +71,21 @@ const ClienteDetailPage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <ClienteDetail
-        cliente={cliente}
+      <ProductDetail
+        product={product}
         onEdit={handleEdit}
         onBack={handleBack}
       />
 
-      {/* Snackbar para erro */}
       <Snackbar
         open={!!error}
         autoHideDuration={6000}
         onClose={limparErro}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert severity="error" sx={{ width: '100%' }}>
-          {error}
-        </Alert>
+        <Alert severity="error">{error}</Alert>
       </Snackbar>
     </Container>
   );
 };
 
-export default ClienteDetailPage;
+export default ProductDetailPage;
