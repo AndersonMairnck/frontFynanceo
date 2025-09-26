@@ -1,3 +1,4 @@
+// src/pages/pdv/PDVPage.tsx
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -35,7 +36,7 @@ const PDVPage: React.FC = () => {
     orderType,
     paymentMethod,
     loading: pdvLoading,
-    error: pdvError, // Renomear para evitar conflito
+    error: pdvError,
     adicionarProduto,
     removerProduto,
     atualizarQuantidade,
@@ -46,7 +47,7 @@ const PDVPage: React.FC = () => {
     selecionarFormaPagamento,
     finalizarVenda,
     calcularTotal,
-    limparErro: limparPdvErro // Renomear para evitar conflito
+    limparErro: limparPdvErro
   } = usePDV();
 
   const { products, carregarProducts, loading: productsLoading, error: productsError } = useProducts();
@@ -59,6 +60,7 @@ const PDVPage: React.FC = () => {
   const [tableModalOpen, setTableModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [pendingPaymentMethod, setPendingPaymentMethod] = useState<string>(''); // NOVO STATE
 
   // Combinar erros
   const error = pdvError || productsError || categoriesError;
@@ -66,7 +68,7 @@ const PDVPage: React.FC = () => {
 
   // Load data
   useEffect(() => {
-    carregarProducts(true); // Include inactive products
+    carregarProducts(true);
     carregarCategories();
   }, [carregarProducts, carregarCategories]);
 
@@ -78,20 +80,50 @@ const PDVPage: React.FC = () => {
   };
 
   const handleFinalizeSale = async () => {
+    // Verificar se há itens no carrinho
+    if (cart.length === 0) {
+      // Mostrar erro se o carrinho estiver vazio
+      // Você pode usar um Snackbar ou Alert para mostrar esta mensagem
+      console.error('Carrinho vazio');
+      return;
+    }
+    
     setPaymentModalOpen(true);
   };
 
-  const handleConfirmPayment = async (method: string, amountReceived?: number) => {
-    selecionarFormaPagamento(method);
-    
-    const result = await finalizarVenda();
-    
-    if (result.success) {
-      setSuccessMessage(`Venda finalizada com sucesso! Pedido: ${result.order.orderNumber}`);
-      setPaymentModalOpen(false);
-    } else {
-      setPaymentModalOpen(false);
+  // CORREÇÃO: Lógica corrigida para evitar dupla chamada
+ const handleConfirmPayment = async (method: string, amountReceived?: number) => {
+  try {
+    console.log('Confirmando pagamento:', method, amountReceived);
+      
+      // 1. Primeiro define o método de pagamento
+      selecionarFormaPagamento(method);
+      
+          
+      // 3. Agora finaliza a venda
+     const result = await finalizarVenda(method);
+      
+      console.log('Resultado da venda:', result);
+      
+      if (result.success) {
+        setSuccessMessage(`Venda finalizada com sucesso! Pedido: ${result.order?.orderNumber || 'N/A'}`);
+        setPaymentModalOpen(false);
+        
+        // Limpa o estado pendente
+        setPendingPaymentMethod('');
+      } else {
+        // Mostra erro se houver
+        console.error('Erro ao finalizar venda:', result.error);
+        // O erro será mostrado pelo hook usePDV através do estado error
+      }
+    } catch (err) {
+      console.error('Erro no processo de pagamento:', err);
     }
+  };
+
+  const handleClosePaymentModal = () => {
+    setPaymentModalOpen(false);
+    setPendingPaymentMethod('');
   };
 
   const handleCloseSuccessMessage = () => {
@@ -187,7 +219,7 @@ const PDVPage: React.FC = () => {
             onClearCart={limparCarrinho}
             onFinalizeSale={handleFinalizeSale}
             total={calcularTotal()}
-            loading={pdvLoading} // Usar pdvLoading específico
+            loading={pdvLoading}
           />
         </Grid>
       </Grid>
@@ -196,7 +228,7 @@ const PDVPage: React.FC = () => {
       <CustomerSelector
         open={customerModalOpen}
         onClose={() => setCustomerModalOpen(false)}
-        onSelect={selecionarCliente} // Agora é compatível
+        onSelect={selecionarCliente}
         selectedCustomer={selectedCustomer}
       />
 
@@ -210,7 +242,7 @@ const PDVPage: React.FC = () => {
 
       <PaymentModal
         open={paymentModalOpen}
-        onClose={() => setPaymentModalOpen(false)}
+        onClose={handleClosePaymentModal} // CORRIGIDO
         onConfirm={handleConfirmPayment}
         total={calcularTotal()}
       />
@@ -219,10 +251,10 @@ const PDVPage: React.FC = () => {
       <Snackbar
         open={!!error}
         autoHideDuration={6000}
-        onClose={limparPdvErro} // Usar nome correto
+        onClose={limparPdvErro}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert severity="error" onClose={limparPdvErro}> {/* Usar nome correto */}
+        <Alert severity="error" onClose={limparPdvErro}>
           {error}
         </Alert>
       </Snackbar>

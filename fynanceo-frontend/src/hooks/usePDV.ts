@@ -28,7 +28,7 @@ interface UsePDVReturn {
   selecionarFormaPagamento: (method: string) => void;
   
   // Ações de Pedido
-  finalizarVenda: () => Promise<{ success: boolean; order?: any; error?: string }>;
+  finalizarVenda: (method?: string)  => Promise<{ success: boolean; order?: any; error?: string }>;
   calcularTotal: () => number;
   calcularTroco: (valorRecebido: number) => number;
   limparErro: () => void;
@@ -146,68 +146,71 @@ export const usePDV = (): UsePDVReturn => {
   }, [calcularTotal]);
 
   // Finalizar venda
-  const finalizarVenda = useCallback(async () => {
-    if (cart.length === 0) {
-      return { success: false, error: 'Carrinho vazio' };
+
+const finalizarVenda = useCallback(async (method?: string) => {
+  const pagamento = method || paymentMethod;
+
+  if (cart.length === 0) {
+    return { success: false, error: 'Carrinho vazio' };
+  }
+
+  if (!pagamento) {
+    return { success: false, error: 'Selecione uma forma de pagamento' };
+  }
+
+  setLoading(true);
+  setError(null);
+
+  try {
+    const items = cart.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice: item.price
+    }));
+
+    let order;
+
+    if (orderType === 'delivery') {
+      // Pedido com entrega
+      const dto: CreateOrderWithDeliveryDTO = {
+        customerId: selectedCustomer?.id,
+        paymentMethod: pagamento,
+        items,
+        deliveryInfo: {
+          deliveryType: 'Delivery',
+          customerPhone: selectedCustomer?.telefone,
+          deliveryAddress: selectedCustomer?.enderecos?.find(e => e.principal)?.logradouro || ''
+        }
+      };
+      order = await orderService.criarComEntrega(dto);
+    } else {
+      // Pedido normal
+      const deliveryType = orderType === 'dinein' ? 'ConsumoLocal' : 'Retirada';
+
+      const dto: CreateOrderDTO = {
+        customerId: selectedCustomer?.id,
+        paymentMethod: pagamento,
+        deliveryType,
+        items
+      };
+      order = await orderService.criar(dto);
     }
 
-    if (!paymentMethod) {
-      return { success: false, error: 'Selecione uma forma de pagamento' };
-    }
+    // Limpar estado após venda bem-sucedida
+    limparCarrinho();
+    setSelectedCustomer(null);
+    setSelectedTable(null);
+    setPaymentMethod('');
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const items = cart.map(item => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.price
-      }));
-
-      let order;
-      
-      if (orderType === 'delivery') {
-        // Pedido com entrega
-        const dto: CreateOrderWithDeliveryDTO = {
-          customerId: selectedCustomer?.id,
-          paymentMethod,
-          items,
-          deliveryInfo: {
-            deliveryType: 'Delivery',
-            customerPhone: selectedCustomer?.telefone,
-            deliveryAddress: selectedCustomer?.enderecos?.find(e => e.principal)?.logradouro || ''
-          }
-        };
-        order = await orderService.criarComEntrega(dto);
-      } else {
-        // Pedido normal
-        const deliveryType = orderType === 'dinein' ? 'ConsumoLocal' : 'Retirada';
-        
-        const dto: CreateOrderDTO = {
-          customerId: selectedCustomer?.id,
-          paymentMethod,
-          deliveryType,
-          items
-        };
-        order = await orderService.criar(dto);
-      }
-
-      // Limpar estado após venda bem-sucedida
-      limparCarrinho();
-      setSelectedCustomer(null);
-      setSelectedTable(null);
-      setPaymentMethod('');
-
-      return { success: true, order };
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao finalizar venda';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
-  }, [cart, paymentMethod, orderType, selectedCustomer, limparCarrinho]);
+    return { success: true, order };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao finalizar venda';
+    setError(errorMessage);
+    return { success: false, error: errorMessage };
+  } finally {
+    setLoading(false);
+  }
+}, [cart, paymentMethod, orderType, selectedCustomer, limparCarrinho]);
 
   // Limpar erro
   const limparErro = useCallback(() => {

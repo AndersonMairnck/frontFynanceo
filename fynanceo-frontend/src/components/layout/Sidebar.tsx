@@ -32,7 +32,11 @@ import {
   ExpandMore,
   TrendingUp,
   Circle,
-  Notifications
+  Notifications,
+    LocalShipping,
+  AccessTime,
+  ListAlt,
+  History
 } from '@mui/icons-material';
 
 interface MenuItem {
@@ -63,6 +67,18 @@ const menuItems: MenuItem[] = [
     path: '/pdv'
   },
    
+  {
+    text: 'Pedidos',
+    icon: <LocalShipping />,
+    path: '/pedidos',
+    badge: '12',
+    children: [
+      { text: 'Pedidos Ativos', icon: <AccessTime />, path: '/pedidos/ativos' },
+      { text: 'Todos os Pedidos', icon: <ListAlt />, path: '/pedidos' },
+      { text: 'Histórico', icon: <History />, path: '/pedidos/historico' }
+    ]
+  },
+  
   {
     text: 'Produtos',
     icon: <Inventory />,

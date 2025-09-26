@@ -17,6 +17,11 @@ const ProductDetailPage = React.lazy(() => import('../pages/produtos/ProductDeta
 const CategoryListPage = React.lazy(() => import('../pages/categorias/CategoryListPage'));
 const CategoryFormPage = React.lazy(() => import('../pages/categorias/CategoryFormPage'));
 
+// NOVAS PÁGINAS DO MÓDULO DE PEDIDOS
+const OrdersPage = React.lazy(() => import('../pages/orders/OrdersPage'));
+const ActiveOrdersPage = React.lazy(() => import('../pages/orders/ActiveOrdersPage'));
+const OrderHistoryPage = React.lazy(() => import('../pages/orders/OrderHistoryPage'));
+
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -67,7 +72,7 @@ const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Outros módulos (placeholders) */}
+      {/* Ponto de Venda */}
       <Route 
         path="/pdv" 
         element={
@@ -76,66 +81,35 @@ const AppRoutes: React.FC = () => {
           </LazyLoad>
         } 
       />
-      {/* <Route 
-        path="/produtos" 
-        element={
-          <LazyLoad>
-            <PlaceholderPage title="Produtos" />
-          </LazyLoad>
-        } 
-      /> */}
+
+      {/* NOVO MÓDULO: PEDIDOS */}
       <Route 
-        path="/produtos/categorias" 
+        path="/pedidos" 
         element={
           <LazyLoad>
-            <PlaceholderPage title="Categorias de Produtos" />
+            <OrdersPage />
           </LazyLoad>
         } 
       />
       <Route 
-        path="/produtos/estoque" 
+        path="/pedidos/ativos" 
         element={
           <LazyLoad>
-            <PlaceholderPage title="Controle de Estoque" />
+            <ActiveOrdersPage />
           </LazyLoad>
         } 
       />
       <Route 
-        path="/vendas" 
+        path="/pedidos/historico" 
         element={
           <LazyLoad>
-            <PlaceholderPage title="Histórico de Vendas" />
+            <OrderHistoryPage />
           </LazyLoad>
         } 
       />
 
-								 
+      {/* Produtos */}
       <Route 
-        path="/vendas/relatorios" 
-        element={
-          <LazyLoad>
-            <PlaceholderPage title="Relatórios de Vendas" />
-          </LazyLoad>
-        } 
-      />
-      <Route 
-        path="/relatorios" 
-        element={
-          <LazyLoad>
-            <PlaceholderPage title="Relatórios" />
-          </LazyLoad>
-        } 
-      />
-      <Route 
-        path="/configuracoes" 
-        element={
-          <LazyLoad>
-            <PlaceholderPage title="Configurações" />
-          </LazyLoad>
-        } 
-      />
-      
-	 <Route 
         path="/produtos" 
         element={
           <LazyLoad>
@@ -168,7 +142,7 @@ const AppRoutes: React.FC = () => {
         } 
       />
 
-      {/* Rotas de Categorias */}
+      {/* Categorias */}
       <Route 
         path="/categorias" 
         element={
@@ -193,12 +167,62 @@ const AppRoutes: React.FC = () => {
           </LazyLoad>
         } 
       />
+
+      {/* Vendas (mantendo compatibilidade com o sidebar existente) */}
+      <Route 
+        path="/vendas" 
+        element={
+          <LazyLoad>
+            <Navigate to="/pedidos" replace />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/vendas/historico" 
+        element={
+          <LazyLoad>
+            <Navigate to="/pedidos/historico" replace />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/vendas/relatorios" 
+        element={
+          <LazyLoad>
+            <PlaceholderPage title="Relatórios de Vendas" />
+          </LazyLoad>
+        } 
+      />
+
+      {/* Outras rotas existentes */}
+      <Route 
+        path="/produtos/estoque" 
+        element={
+          <LazyLoad>
+            <PlaceholderPage title="Controle de Estoque" />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/relatorios" 
+        element={
+          <LazyLoad>
+            <PlaceholderPage title="Relatórios" />
+          </LazyLoad>
+        } 
+      />
+      <Route 
+        path="/configuracoes" 
+        element={
+          <LazyLoad>
+            <PlaceholderPage title="Configurações" />
+          </LazyLoad>
+        } 
+      />
       
-      {/* Rota padrão */}
-      <Route path="/" element={<Navigate to="/produtos" replace />} />
-      					  
-																	  
-	  
+      {/* Rota padrão alternativa */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      
       {/* Rota 404 */}
       <Route path="*" element={<div>Página não encontrada</div>} />
     </Routes>
