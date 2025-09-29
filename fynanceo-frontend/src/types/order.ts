@@ -4,18 +4,15 @@
 export interface Order {
   id: number;
   orderNumber: string;
-  customerId?: number;
   customerName?: string;
-  userId: number;
-  userName?: string;
-  totalAmount: number;
+  tableNumber?: number;
+  orderType: 'Mesa' | 'Balcao' | 'Delivery';
   status: string;
-  paymentMethod: string;
-  isDelivery: boolean;
-  deliveryType: string;
+  paymentStatus: string;
+  totalAmount: number;
+  items: OrderItemDTO[];
   createdAt: Date;
-  modifiedAt?: Date;
-  modifiedByUserId?: number;
+  notes?: string;
 }
 
 export interface OrderItem {
@@ -175,4 +172,23 @@ export interface Table {
   capacity: number;
   status: 'available' | 'occupied' | 'reserved';
   currentOrderId?: number;
+}
+
+export interface CreateOrderRequest {
+  customerId?: number;
+  tableNumber?: number;
+  orderType: string;
+  notes?: string;
+}
+
+export interface AddItemsRequest {
+  orderId: number;
+  items: CreateOrderItemDTO[];
+}
+
+export interface ProcessPaymentRequest {
+  orderId: number;
+  paymentMethod: string;
+  amount: number;
+  transactionId?: string;
 }

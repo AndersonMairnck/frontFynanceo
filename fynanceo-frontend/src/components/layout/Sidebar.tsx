@@ -36,7 +36,8 @@ import {
     LocalShipping,
   AccessTime,
   ListAlt,
-  History
+  History,
+  TableRestaurant
 } from '@mui/icons-material';
 
 interface MenuItem {
@@ -65,6 +66,14 @@ const menuItems: MenuItem[] = [
     text: 'Ponto de Venda',
     icon: <PointOfSale />,
     path: '/pdv'
+  },
+   // 🆕 NOVO ITEM - GESTÃO DE MESAS
+  {
+    text: 'Gestão de Mesas',
+    icon: <TableRestaurant />,
+    path: '/mesas',
+    badge: 'NOVO',
+    isNew: true
   },
    
   {

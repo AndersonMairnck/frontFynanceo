@@ -1,4 +1,5 @@
 // src/types/delivery.ts
+
 export interface OrderStatus {
   id: string;
   name: string;
