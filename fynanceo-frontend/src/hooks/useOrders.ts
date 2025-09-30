@@ -24,7 +24,7 @@ interface UseOrdersReturn {
   clearError: () => void;
 }
 
-// Dados mock para desenvolvimento
+// Dados mock para desenvolvimento (ATUALIZADO com productId)
 const mockOrders: DeliveryOrder[] = [
   {
     id: 1,
@@ -42,8 +42,20 @@ const mockOrders: DeliveryOrder[] = [
     updatedAt: new Date(),
     orderAmount: 45.50,
     orderItems: [
-      { productName: 'Pizza Calabresa', quantity: 1, unitPrice: 35.00, totalPrice: 35.00 },
-      { productName: 'Coca-Cola 2L', quantity: 1, unitPrice: 10.50, totalPrice: 10.50 }
+      { 
+        productId: 1, // ✅ ADICIONADO
+        productName: 'Pizza Calabresa', 
+        quantity: 1, 
+        unitPrice: 35.00, 
+        totalPrice: 35.00 
+      },
+      { 
+        productId: 2, // ✅ ADICIONADO
+        productName: 'Coca-Cola 2L', 
+        quantity: 1, 
+        unitPrice: 10.50, 
+        totalPrice: 10.50 
+      }
     ]
   },
   {
@@ -62,8 +74,20 @@ const mockOrders: DeliveryOrder[] = [
     updatedAt: new Date(),
     orderAmount: 68.00,
     orderItems: [
-      { productName: 'Hambúrguer Artesanal', quantity: 2, unitPrice: 25.00, totalPrice: 50.00 },
-      { productName: 'Batata Frita', quantity: 1, unitPrice: 18.00, totalPrice: 18.00 }
+      { 
+        productId: 3, // ✅ ADICIONADO
+        productName: 'Hambúrguer Artesanal', 
+        quantity: 2, 
+        unitPrice: 25.00, 
+        totalPrice: 50.00 
+      },
+      { 
+        productId: 4, // ✅ ADICIONADO
+        productName: 'Batata Frita', 
+        quantity: 1, 
+        unitPrice: 18.00, 
+        totalPrice: 18.00 
+      }
     ]
   }
 ];

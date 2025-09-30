@@ -31,6 +31,12 @@ export interface OrderItemDTO {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+ id?: number;
+  orderId?: number;
+  productId: number; // CORREÇÃO: Adicionar productId
+ 
+
+
 }
 
 export interface DeliveryStats {

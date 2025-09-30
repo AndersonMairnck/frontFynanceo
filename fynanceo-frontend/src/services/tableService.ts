@@ -1,7 +1,12 @@
-// src/services/tableService.ts
+// src/services/tableService.ts (ATUALIZADO)
 import api from './api';
-import {  } from '../types/delivery';
-import { Order,CreateOrderRequest, AddItemsRequest, ProcessPaymentRequest } from '../types/order';
+import { 
+  Order, 
+  CreateOrderRequest, 
+  AddItemsRequest, 
+  ProcessPaymentRequest,
+  CreateOrderItemDTO 
+} from '../types/order';
 
 export const tableService = {
   // Criar pedido sem pagamento
@@ -44,6 +49,27 @@ export const tableService = {
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar pedidos da mesa:', error);
+      throw error;
+    }
+  },
+
+  // Buscar pedido por ID
+  async getOrderById(orderId: number): Promise<Order> {
+    try {
+      const response = await api.get<Order>(`/orders/${orderId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar pedido:', error);
+      throw error;
+    }
+  },
+
+  // Deletar pedido (se necessário)
+  async deleteOrder(orderId: number): Promise<void> {
+    try {
+      await api.delete(`/orders/${orderId}`);
+    } catch (error) {
+      console.error('Erro ao deletar pedido:', error);
       throw error;
     }
   }
